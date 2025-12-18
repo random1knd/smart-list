@@ -4,62 +4,73 @@
  */
 
 /**
- * v001: Create notes table with all necessary fields and indexes
+ * v001: Create notes table - absolute minimum for testing
  */
 const V001_CREATE_NOTES_TABLE = `
 CREATE TABLE IF NOT EXISTS notes (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   issue_key VARCHAR(255) NOT NULL,
-  title VARCHAR(500) NOT NULL,
-  content TEXT,
-  created_by VARCHAR(128) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deadline TIMESTAMP NULL,
-  is_public BOOLEAN DEFAULT FALSE,
-  status VARCHAR(50) DEFAULT 'open',
-  INDEX idx_issue_key (issue_key),
-  INDEX idx_created_by (created_by),
-  INDEX idx_is_public (is_public)
+  title VARCHAR(500) NOT NULL
 )`;
 
 /**
- * v002: Create note_permissions table for sharing functionality
+ * v002: Create note_permissions table - absolute minimum for testing
  */
 const V002_CREATE_NOTE_PERMISSIONS_TABLE = `
 CREATE TABLE IF NOT EXISTS note_permissions (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   note_id BIGINT NOT NULL,
-  user_account_id VARCHAR(128) NOT NULL,
-  permission_type VARCHAR(50) DEFAULT 'read',
-  granted_by VARCHAR(128) NOT NULL,
-  granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_note_id (note_id),
-  INDEX idx_user_account_id (user_account_id),
-  UNIQUE KEY unique_user_note (note_id, user_account_id)
+  user_account_id VARCHAR(128) NOT NULL
 )`;
 
 /**
- * v003: Create notifications table for deadline and sharing notifications
+ * v003: Create notifications table - absolute minimum for testing
  */
 const V003_CREATE_NOTIFICATIONS_TABLE = `
 CREATE TABLE IF NOT EXISTS notifications (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   user_account_id VARCHAR(128) NOT NULL,
-  note_id BIGINT,
-  type VARCHAR(50) NOT NULL,
-  title VARCHAR(500) NOT NULL,
-  message TEXT,
-  is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_user_account_id (user_account_id),
-  INDEX idx_note_id (note_id),
-  INDEX idx_is_read (is_read),
-  INDEX idx_created_at (created_at)
+  type VARCHAR(50) NOT NULL
 )`;
+
+/**
+ * v004: Add missing columns to notes table
+ */
+const V004_ALTER_NOTES_ADD_COLUMNS = `
+ALTER TABLE notes
+ADD COLUMN IF NOT EXISTS content TEXT,
+ADD COLUMN IF NOT EXISTS created_by VARCHAR(128),
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ADD COLUMN IF NOT EXISTS deadline TIMESTAMP NULL,
+ADD COLUMN IF NOT EXISTS is_public BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'open'`;
+
+/**
+ * v005: Add missing columns to note_permissions table
+ */
+const V005_ALTER_PERMISSIONS_ADD_COLUMNS = `
+ALTER TABLE note_permissions
+ADD COLUMN IF NOT EXISTS permission_type VARCHAR(50) DEFAULT 'read',
+ADD COLUMN IF NOT EXISTS granted_by VARCHAR(128),
+ADD COLUMN IF NOT EXISTS granted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`;
+
+/**
+ * v006: Add missing columns to notifications table
+ */
+const V006_ALTER_NOTIFICATIONS_ADD_COLUMNS = `
+ALTER TABLE notifications
+ADD COLUMN IF NOT EXISTS note_id BIGINT,
+ADD COLUMN IF NOT EXISTS title VARCHAR(500),
+ADD COLUMN IF NOT EXISTS message TEXT,
+ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`;
 
 module.exports = {
   V001_CREATE_NOTES_TABLE,
   V002_CREATE_NOTE_PERMISSIONS_TABLE,
-  V003_CREATE_NOTIFICATIONS_TABLE
+  V003_CREATE_NOTIFICATIONS_TABLE,
+  V004_ALTER_NOTES_ADD_COLUMNS,
+  V005_ALTER_PERMISSIONS_ADD_COLUMNS,
+  V006_ALTER_NOTIFICATIONS_ADD_COLUMNS
 };

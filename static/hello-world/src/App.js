@@ -62,6 +62,7 @@ function App() {
   //   placeholder: 'Start writing your note...'
   // };
   const editorConfig = {
+    licenseKey: 'GPL', // Using GPL license for open source
     toolbar: [
       'undo', 'redo', '|',
       'heading', '|',

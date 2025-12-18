@@ -11,14 +11,15 @@ const resolver = new Resolver();
 
 // Ensure database migrations are applied on first use
 let migrationsChecked = false;
-async function ensureDbInitialized() {
-  if (!migrationsChecked) {
+async function ensureDbInitialized(forceReset = false) {
+  if (!migrationsChecked || forceReset) {
     try {
-      await ensureMigrationsApplied();
+      await ensureMigrationsApplied(forceReset);
       migrationsChecked = true;
       console.log('Database migrations check completed');
     } catch (error) {
       console.error('Database migrations failed:', error);
+      migrationsChecked = false; // Allow retry
       throw error;
     }
   }
@@ -220,6 +221,20 @@ resolver.define('markAllAsRead', async (req) => {
   } catch (error) {
     console.error('Error in markAllAsRead resolver:', error);
     return { error: error.message, success: false };
+  }
+});
+
+// ===== Debug Resolvers =====
+
+resolver.define('resetMigrations', async (req) => {
+  try {
+    console.log('🔄 Force reset migrations requested...');
+    await ensureDbInitialized(true); // Force reset
+    console.log('✅ Migrations reset completed');
+    return { success: true, message: 'Migrations reset and re-run successfully' };
+  } catch (error) {
+    console.error('❌ Error resetting migrations:', error);
+    return { success: false, error: error.message };
   }
 });
 

@@ -32,8 +32,8 @@ class DatabaseService {
         .bindParams(issueKey, title, content || '', createdBy, deadline, isPublic || false)
         .execute();
 
-      if (result && result.insertId) {
-        return await this.getNoteById(result.insertId);
+      if (result && result.rows && result.rows.insertId) {
+        return await this.getNoteById(result.rows.insertId);
       }
 
       throw new Error('Failed to create note');
@@ -51,7 +51,7 @@ class DatabaseService {
       const query = `SELECT * FROM notes WHERE id = ?`;
       const result = await sql.prepare(query).bindParams(noteId).execute();
 
-      return result.length > 0 ? result[0] : null;
+      return result.rows.length > 0 ? result.rows[0] : null;
     } catch (error) {
       console.error('Error getting note by ID:', error);
       throw error;
@@ -73,7 +73,7 @@ class DatabaseService {
       `;
       const result = await sql.prepare(query).bindParams(issueKey, userId, userId).execute();
 
-      return result || [];
+      return result.rows || [];
     } catch (error) {
       console.error('Error getting notes by issue:', error);
       throw error;
@@ -88,7 +88,7 @@ class DatabaseService {
       const query = `SELECT * FROM notes WHERE created_by = ? ORDER BY created_at DESC`;
       const result = await sql.prepare(query).bindParams(userId).execute();
 
-      return result || [];
+      return result.rows || [];
     } catch (error) {
       console.error('Error getting user notes:', error);
       throw error;
@@ -152,7 +152,7 @@ class DatabaseService {
       // Then delete the note
       const result = await sql.prepare('DELETE FROM notes WHERE id = ?').bindParams(noteId).execute();
 
-      return result && result.affectedRows > 0;
+      return result && result.rows && result.rows.affectedRows > 0;
     } catch (error) {
       console.error('Error deleting note:', error);
       throw error;
@@ -191,7 +191,7 @@ class DatabaseService {
       const query = `DELETE FROM note_permissions WHERE note_id = ? AND user_account_id = ?`;
       const result = await sql.prepare(query).bindParams(noteId, targetUserId).execute();
 
-      return result && result.affectedRows > 0;
+      return result && result.rows && result.rows.affectedRows > 0;
     } catch (error) {
       console.error('Error revoking access:', error);
       throw error;
@@ -206,7 +206,7 @@ class DatabaseService {
       const query = `SELECT * FROM notes WHERE issue_key = ? AND is_public = TRUE ORDER BY created_at DESC`;
       const result = await sql.prepare(query).bindParams(issueKey).execute();
 
-      return result || [];
+      return result.rows || [];
     } catch (error) {
       console.error('Error getting public notes:', error);
       throw error;
@@ -238,11 +238,11 @@ class DatabaseService {
       const query = `SELECT permission_type FROM note_permissions WHERE note_id = ? AND user_account_id = ?`;
       const permissions = await sql.prepare(query).bindParams(noteId, userId).execute();
 
-      if (permissions.length === 0) {
+      if (permissions.rows.length === 0) {
         return false;
       }
 
-      const userPermission = permissions[0].permission_type;
+      const userPermission = permissions.rows[0].permission_type;
 
       if (requiredPermission === 'write') {
         return userPermission === 'write';
