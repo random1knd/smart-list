@@ -1,5 +1,5 @@
 const databaseService = require('../../infrastructure/database/database-service');
-const { requestJira } = require('@forge/api');
+const api = require('@forge/api');
 
 /**
  * Notes service - handles business logic for notes
@@ -169,24 +169,44 @@ class NotesService {
    */
   async getProjectUsers(issueKey) {
     try {
-      // Get the issue to find the project key
-      const issueResponse = await requestJira(`/rest/api/3/issue/${issueKey}`, {
+      console.log('getProjectUsers called with issueKey:', issueKey);
+      
+      // Get the issue to find the project key - use asUser() for proper permissions
+      const issueResponse = await api.asUser().requestJira(api.route`/rest/api/3/issue/${issueKey}`, {
         headers: {
           'Accept': 'application/json'
         }
       });
+
+      if (!issueResponse.ok) {
+        throw new Error(`Failed to fetch issue: ${issueResponse.status} ${issueResponse.statusText}`);
+      }
 
       const issue = await issueResponse.json();
-      const projectKey = issue.fields.project.key;
+      console.log('Issue response:', JSON.stringify(issue, null, 2));
 
-      // Get users who can browse the project
-      const usersResponse = await requestJira(`/rest/api/3/user/assignable/search?project=${projectKey}`, {
+      // Check if the issue has the expected structure
+      if (!issue || !issue.fields || !issue.fields.project) {
+        console.error('Invalid issue structure:', issue);
+        throw new Error('Issue does not contain project information');
+      }
+
+      const projectKey = issue.fields.project.key;
+      console.log('Project key:', projectKey);
+
+      // Get users who can browse the project - use asUser() for proper permissions
+      const usersResponse = await api.asUser().requestJira(api.route`/rest/api/3/user/assignable/search?project=${projectKey}`, {
         headers: {
           'Accept': 'application/json'
         }
       });
 
+      if (!usersResponse.ok) {
+        throw new Error(`Failed to fetch users: ${usersResponse.status} ${usersResponse.statusText}`);
+      }
+
       const users = await usersResponse.json();
+      console.log('Users response:', JSON.stringify(users, null, 2));
 
       return users.map(user => ({
         accountId: user.accountId,

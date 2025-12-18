@@ -181,7 +181,21 @@ resolver.define('getPublicNotesByIssue', async (req) => {
 
 resolver.define('getProjectUsers', async (req) => {
   try {
-    const { issueKey } = req.payload;
+    // Try to get issue key from payload first, then from context
+    let issueKey = req.payload?.issueKey;
+    if (!issueKey && req.context?.extension?.issue?.key) {
+      issueKey = req.context.extension.issue.key;
+    }
+
+    console.log('getProjectUsers called with:', { 
+      payloadIssueKey: req.payload?.issueKey, 
+      contextIssueKey: req.context?.extension?.issue?.key,
+      finalIssueKey: issueKey 
+    });
+
+    if (!issueKey) {
+      throw new Error('No issue key provided');
+    }
 
     const users = await notesService.getProjectUsers(issueKey);
     return { users, success: true };
