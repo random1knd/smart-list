@@ -23,7 +23,8 @@ modules:
 resources:
   - key: main
     path: static/hello-world/build
-
+    tunnel:
+      port: 3000
 permissions:
   content:
     styles:

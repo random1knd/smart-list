@@ -362,7 +362,7 @@ function App() {
                 >
                   {note.status === 'open' ? 'Mark Complete' : 'Reopen'}
                 </Button>
-                {note.createdBy === currentUser && (
+                {note.created_by === currentUser && (
                   <>
                     <Button
                       appearance="subtle"
