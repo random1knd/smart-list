@@ -220,7 +220,7 @@ class NotesService {
    */
   async getProjectUsers(issueKey) {
     try {
-      console.log('getProjectUsers called with issueKey:', issueKey);
+      // console.log('getProjectUsers called with issueKey:', issueKey);
       
       // Get the issue to find the project key - use asUser() for proper permissions
       const issueResponse = await api.asUser().requestJira(api.route`/rest/api/3/issue/${issueKey}`, {
@@ -234,7 +234,7 @@ class NotesService {
       }
 
       const issue = await issueResponse.json();
-      console.log('Issue response:', JSON.stringify(issue, null, 2));
+      // console.log('Issue response:', JSON.stringify(issue, null, 2));
 
       // Check if the issue has the expected structure
       if (!issue || !issue.fields || !issue.fields.project) {
@@ -243,7 +243,7 @@ class NotesService {
       }
 
       const projectKey = issue.fields.project.key;
-      console.log('Project key:', projectKey);
+      // console.log('Project key:', projectKey);
 
       // Get users who can browse the project - use asUser() for proper permissions
       const usersResponse = await api.asUser().requestJira(api.route`/rest/api/3/user/assignable/search?project=${projectKey}`, {
@@ -257,9 +257,22 @@ class NotesService {
       }
 
       const users = await usersResponse.json();
-      console.log('Users response:', JSON.stringify(users, null, 2));
 
-      return users.map(user => ({
+      // Filter out non-user accounts (apps, bots, etc.) - only show real users
+      const realUsers = users.filter(user => {
+        const displayName = user.displayName?.toLowerCase() || '';
+        const isBot = displayName.includes('bot') || 
+                     displayName.includes('app') || 
+                     displayName.includes('provision') ||
+                     displayName.includes('oneatlas') ||
+                     displayName.includes('bitbucket');
+        
+        return user.accountType === 'atlassian' && 
+               user.active !== false &&
+               !isBot;
+      });
+
+      return realUsers.map(user => ({
         accountId: user.accountId,
         displayName: user.displayName,
         avatarUrl: user.avatarUrls ? user.avatarUrls['48x48'] : null

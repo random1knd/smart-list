@@ -207,11 +207,11 @@ resolver.define('getProjectUsers', async (req) => {
       issueKey = req.context.extension.issue.key;
     }
 
-    console.log('getProjectUsers called with:', { 
-      payloadIssueKey: req.payload?.issueKey, 
-      contextIssueKey: req.context?.extension?.issue?.key,
-      finalIssueKey: issueKey 
-    });
+    // console.log('getProjectUsers called with:', { 
+    //   payloadIssueKey: req.payload?.issueKey, 
+    //   contextIssueKey: req.context?.extension?.issue?.key,
+    //   finalIssueKey: issueKey 
+    // });
 
     if (!issueKey) {
       throw new Error('No issue key provided');
