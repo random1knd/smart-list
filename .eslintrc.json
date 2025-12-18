@@ -1,0 +1,14 @@
+{
+  "root": true,
+  "extends": ["eslint:recommended"],
+  "env": {
+    "node": true,
+    "es6": true,
+    "commonjs": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "rules": {},
+  "ignorePatterns": ["static/**/*", "dist/**/*", "node_modules/**/*"]
+}

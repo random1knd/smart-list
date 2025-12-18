@@ -1,0 +1,5 @@
+static/*/node_modules
+static/*/src
+static/*/.eslintrc.json
+static/*/package.json
+static/*/package-lock.json

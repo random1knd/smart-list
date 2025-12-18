@@ -1,0 +1,22 @@
+{
+  "name": "private-notes",
+  "version": "1.0.0",
+  "description": "A Jira Forge app for managing private notes on issues with sharing and deadline features",
+  "main": "src/index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --ext .js --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "@forge/api": "^6.4.2",
+    "@forge/resolver": "^1.7.1",
+    "@forge/sql": "^3.0.14"
+  }
+}

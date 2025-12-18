@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(forge deploy:*)",
+      "Bash(forge logs:*)",
+      "WebFetch(domain:developer.atlassian.com)",
+      "WebFetch(domain:atlassian.design)",
+      "mcp__forge__forge-ui-kit-developer-guide",
+      "mcp__forge__forge-development-guide",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "mcp__forge__search-forge-docs",
+      "WebSearch",
+      "WebFetch(domain:community.developer.atlassian.com)",
+      "mcp__forge__list-forge-modules",
+      "mcp__forge__forge-backend-developer-guide",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(npm view:*)",
+      "Bash(npm run lint:*)",
+      "Bash(move hello-world notes-panel)",
+      "Bash(mv:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(forge lint:*)",
+      "Bash(del staticactivity-panel.eslintrc.json)",
+      "Bash(npm audit:*)",
+      "Bash(npm update:*)"
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "forge"
+  ]
+}

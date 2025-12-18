@@ -1,0 +1,15 @@
+# Ignore static frontend directory (has its own ESLint config)
+static
+static/
+static/**
+static/**/*
+**/build
+**/build/
+**/build/**
+
+# Standard ignores
+node_modules/
+dist/
+build/
+coverage/
+*.min.js

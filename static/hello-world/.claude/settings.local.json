@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Remove-Item -Recurse -Force node_modules)",
+      "Bash(Remove-Item -Force package-lock.json)",
+      "Bash(rm:*)",
+      "Bash(npm install:*)",
+      "Bash(npm start)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "forge"
+  ]
+}

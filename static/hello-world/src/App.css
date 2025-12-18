@@ -1,0 +1,271 @@
+.app-container {
+  padding: 20px;
+  max-width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #172B4D;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+
+.loading-container p {
+  color: #6B778C;
+  font-size: 14px;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.note-card {
+  background: #FFFFFF;
+  border: 1px solid #DFE1E6;
+  border-radius: 8px;
+  padding: 20px;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.note-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.note-header {
+  margin-bottom: 12px;
+}
+
+.note-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.note-title-row h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #172B4D;
+  flex: 1;
+}
+
+.note-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.note-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #6B778C;
+}
+
+.note-content {
+  margin: 16px 0;
+  padding: 16px;
+  background: #F4F5F7;
+  border-radius: 4px;
+  color: #172B4D;
+  line-height: 1.6;
+  min-height: 60px;
+}
+
+.note-content p {
+  margin: 8px 0;
+}
+
+.note-content ul,
+.note-content ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.note-content pre {
+  background: #172B4D;
+  color: #FFFFFF;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.note-content code {
+  background: #DFE1E6;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+}
+
+.note-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.note-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.note-content table td,
+.note-content table th {
+  border: 1px solid #DFE1E6;
+  padding: 8px;
+  text-align: left;
+}
+
+.note-content table th {
+  background: #F4F5F7;
+  font-weight: 600;
+}
+
+.note-content .todo-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.note-content .todo-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.note-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #E0E0E0;
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #172B4D;
+  font-size: 14px;
+}
+
+.ck-editor__editable {
+  min-height: 200px;
+  max-height: 400px;
+}
+
+/* CKEditor custom styling */
+.ck.ck-editor {
+  width: 100%;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+  background: #FFFFFF;
+  border: 2px solid #DFE1E6;
+  border-radius: 3px;
+}
+
+.ck.ck-editor__main > .ck-editor__editable:focus {
+  border-color: #4C9AFF;
+  box-shadow: 0 0 0 2px rgba(76, 154, 255, 0.2);
+}
+
+.ck.ck-toolbar {
+  background: #F4F5F7;
+  border: 2px solid #DFE1E6;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+}
+
+/* Empty state styling */
+[data-testid="empty-state-container"] {
+  padding: 60px 20px;
+}
+
+/* Section message styling */
+[data-testid="section-message"] {
+  margin-bottom: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .note-title-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .note-actions {
+    flex-wrap: wrap;
+  }
+
+  .ck-editor__editable {
+    min-height: 150px;
+  }
+}
+
+/* Animation for modals */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-testid="modal-dialog"] {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Improve button spacing in modals */
+[data-testid="modal-footer"] {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Loading spinner centering */
+[data-testid="spinner"] {
+  display: inline-block;
+}

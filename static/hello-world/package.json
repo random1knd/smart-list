@@ -1,0 +1,47 @@
+{
+  "name": "private-notes-panel",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": ".",
+  "dependencies": {
+    "@atlaskit/button": "^18.1.0",
+    "@atlaskit/css-reset": "^6.6.2",
+    "@atlaskit/datetime-picker": "^13.8.0",
+    "@atlaskit/empty-state": "^7.10.0",
+    "@atlaskit/form": "^10.4.0",
+    "@atlaskit/icon": "^22.11.0",
+    "@atlaskit/lozenge": "^11.9.0",
+    "@atlaskit/modal-dialog": "^12.14.0",
+    "@atlaskit/section-message": "^6.5.0",
+    "@atlaskit/select": "^17.12.0",
+    "@atlaskit/spinner": "^16.2.0",
+    "@atlaskit/textfield": "^6.4.0",
+    "@atlaskit/toggle": "^13.2.0",
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
+    "@ckeditor/ckeditor5-react": "^6.2.0",
+    "@forge/bridge": "^3.0.0",
+    "ajv": "^8.17.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
