@@ -66,7 +66,7 @@ const ensureMigrationsApplied = async (forceReset = false) => {
     
     // Check if we've already run migrations for this version
     const schemaReady = await storage.get(SCHEMA_VERSION_KEY);
-    
+
     if (schemaReady) {
       console.log('Database schema is ready (cached)');
       // Double check that tables actually exist
@@ -74,7 +74,7 @@ const ensureMigrationsApplied = async (forceReset = false) => {
         const migrations = await migrationRunner.list();
         const completedMigrations = migrations.filter(m => m.executed_at);
         console.log(`Verified ${completedMigrations.length} completed migrations`);
-        
+
         // If no migrations have completed, clear cache and retry
         if (completedMigrations.length === 0) {
           console.log('Cache flag set but no migrations completed, clearing cache and retrying...');

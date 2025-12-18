@@ -68,7 +68,7 @@ function App() {
       'heading', '|',
       'bold', 'italic', '|',
       'link', 'blockQuote', '|',
-      'bulletedList', 'numberedList', 'todoList', '|',
+      'bulletedList', 'numberedList', '|',
       'insertTable'
     ],
     placeholder: 'Start writing your note...'
@@ -451,9 +451,9 @@ function App() {
               <Button
                 appearance="primary"
                 onClick={handleCreateNote}
-                isLoading={submitting}
+                isDisabled={submitting}
               >
-                Create
+                {submitting ? 'Creating...' : 'Create'}
               </Button>
             </ModalFooter>
           </Modal>
@@ -521,9 +521,9 @@ function App() {
               <Button
                 appearance="primary"
                 onClick={handleUpdateNote}
-                isLoading={submitting}
+                isDisabled={submitting}
               >
-                Save Changes
+                {submitting ? 'Saving...' : 'Save Changes'}
               </Button>
             </ModalFooter>
           </Modal>
@@ -576,9 +576,9 @@ function App() {
               <Button
                 appearance="primary"
                 onClick={handleShareNote}
-                isLoading={submitting}
+                isDisabled={submitting}
               >
-                Share
+                {submitting ? 'Sharing...' : 'Share'}
               </Button>
             </ModalFooter>
           </Modal>
