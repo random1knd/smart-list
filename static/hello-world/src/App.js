@@ -49,20 +49,8 @@ function App() {
   const [permissionType, setPermissionType] = useState('read');
   const [loadingUsers, setLoadingUsers] = useState(false);
 
-  // CKEditor configuration
-  // const editorConfig = {
-  //   toolbar: [
-  //     'undo', 'redo', '|',
-  //     'heading', '|',
-  //     'bold', 'italic', '|',
-  //     'link', 'blockQuote', '|',
-  //     'bulletedList', 'numberedList', '|',
-  //     'insertTable'
-  //   ],
-  //   placeholder: 'Start writing your note...'
-  // };
+  // CKEditor configuration - stable version without todoList
   const editorConfig = {
-    licenseKey: 'GPL', // Using GPL license for open source
     toolbar: [
       'undo', 'redo', '|',
       'heading', '|',
