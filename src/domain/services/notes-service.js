@@ -141,6 +141,57 @@ class NotesService {
   }
 
   /**
+   * Share a note with multiple users (owner only)
+   */
+  async shareNoteMultiple({ noteId, targetUserIds, permissionType, userId }) {
+    const note = await databaseService.getNoteById(noteId);
+
+    if (!note) {
+      throw new Error('Note not found');
+    }
+
+    if (note.created_by !== userId) {
+      throw new Error('Only the note owner can share it');
+    }
+
+    if (!['read', 'write'].includes(permissionType)) {
+      throw new Error('Invalid permission type');
+    }
+
+    if (!Array.isArray(targetUserIds) || targetUserIds.length === 0) {
+      throw new Error('Target user IDs must be a non-empty array');
+    }
+
+    // Share with each user individually and collect results
+    const results = [];
+    const errors = [];
+
+    for (const targetUserId of targetUserIds) {
+      try {
+        const permission = await databaseService.shareNote({
+          noteId,
+          targetUserId,
+          permissionType,
+          grantedBy: userId
+        });
+        results.push({ targetUserId, success: true, permission });
+      } catch (error) {
+        console.error(`Failed to share with user ${targetUserId}:`, error);
+        errors.push({ targetUserId, success: false, error: error.message });
+        results.push({ targetUserId, success: false, error: error.message });
+      }
+    }
+
+    // Return results with summary
+    return {
+      totalUsers: targetUserIds.length,
+      successfulShares: results.filter(r => r.success).length,
+      failedShares: errors.length,
+      results: results
+    };
+  }
+
+  /**
    * Revoke access to a note (owner only)
    */
   async revokeAccess({ noteId, targetUserId, userId }) {

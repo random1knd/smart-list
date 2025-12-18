@@ -45,7 +45,7 @@ function App() {
 
   // Share modal states
   const [projectUsers, setProjectUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [permissionType, setPermissionType] = useState('read');
   const [loadingUsers, setLoadingUsers] = useState(false);
 
@@ -198,22 +198,25 @@ function App() {
   };
 
   const handleShareNote = async () => {
-    if (!selectedUser) {
-      setError('Please select a user');
+    if (!selectedUsers || selectedUsers.length === 0) {
+      setError('Please select at least one user');
       return;
     }
 
     setSubmitting(true);
     try {
-      await invoke('shareNote', {
+      // Share with multiple users
+      const userIds = selectedUsers.map(user => user.value);
+      
+      await invoke('shareNoteMultiple', {
         noteId: selectedNote.id,
-        targetUserId: selectedUser.value,
+        targetUserIds: userIds,
         permissionType,
       });
 
       setIsShareModalOpen(false);
       setSelectedNote(null);
-      setSelectedUser(null);
+      setSelectedUsers([]);
       setError(null);
     } catch (err) {
       console.error('Failed to share note:', err);
@@ -527,16 +530,17 @@ function App() {
             </ModalHeader>
             <ModalBody>
               <div className="form-field">
-                <label htmlFor="user-select">Select User</label>
+                <label htmlFor="user-select">Select Users</label>
                 {loadingUsers ? (
                   <Spinner size="medium" />
                 ) : (
                   <Select
                     inputId="user-select"
                     options={projectUsers}
-                    value={selectedUser}
-                    onChange={setSelectedUser}
-                    placeholder="Choose a user"
+                    value={selectedUsers}
+                    onChange={setSelectedUsers}
+                    placeholder="Choose users to share with"
+                    isMulti={true}
                   />
                 )}
               </div>

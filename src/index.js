@@ -147,6 +147,26 @@ resolver.define('shareNote', async (req) => {
   }
 });
 
+resolver.define('shareNoteMultiple', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const { noteId, targetUserIds, permissionType } = req.payload;
+    const userId = req.context.accountId;
+
+    const results = await notesService.shareNoteMultiple({
+      noteId,
+      targetUserIds,
+      permissionType,
+      userId
+    });
+
+    return { results, success: true };
+  } catch (error) {
+    console.error('Error in shareNoteMultiple resolver:', error);
+    return { error: error.message, success: false };
+  }
+});
+
 resolver.define('revokeAccess', async (req) => {
   try {
     await ensureDbInitialized();
