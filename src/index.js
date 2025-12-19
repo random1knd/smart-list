@@ -5,6 +5,7 @@
 
 const Resolver = require('@forge/resolver').default;
 const notesService = require('./domain/services/notes-service');
+const databaseService = require('./infrastructure/database/database-service');
 const { ensureMigrationsApplied } = require('./migrations/runner');
 
 const resolver = new Resolver();
@@ -70,7 +71,25 @@ resolver.define('getNotesByIssue', async (req) => {
     const issueKey = req.context.extension.issue.key;
 
     const notes = await notesService.getNotesByIssue(issueKey, userId);
-    return { notes, success: true };
+
+    // Add permission information for each note
+    const notesWithPermissions = await Promise.all(
+      notes.map(async (note) => {
+        const canEdit = await databaseService.hasPermission(note.id, userId, 'write');
+        const canRead = await databaseService.hasPermission(note.id, userId, 'read');
+        
+        return {
+          ...note,
+          permissions: {
+            canEdit,
+            canRead,
+            isOwner: note.created_by === userId
+          }
+        };
+      })
+    );
+
+    return { notes: notesWithPermissions, success: true };
   } catch (error) {
     console.error('Error in getNotesByIssue resolver:', error);
     return { error: error.message, success: false, notes: [] };

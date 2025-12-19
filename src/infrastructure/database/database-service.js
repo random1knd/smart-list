@@ -59,7 +59,8 @@ class DatabaseService {
   }
 
   /**
-   * Get all notes for an issue that the user can access
+   * Get all notes for an issue that the user can access (PRIVATE NOTES ONLY)
+   * Public notes are handled separately for the activity panel
    */
   async getNotesByIssue(issueKey, userId) {
     try {
@@ -68,7 +69,7 @@ class DatabaseService {
         FROM notes n
         LEFT JOIN note_permissions np ON n.id = np.note_id
         WHERE n.issue_key = ?
-          AND (n.created_by = ? OR np.user_account_id = ? OR n.is_public = TRUE)
+          AND (n.created_by = ? OR np.user_account_id = ?)
         ORDER BY n.created_at DESC
       `;
       const result = await sql.prepare(query).bindParams(issueKey, userId, userId).execute();
@@ -199,11 +200,17 @@ class DatabaseService {
   }
 
   /**
-   * Get public notes for an issue (for activity panel)
+   * Get public notes for an issue (for future activity panel)
+   * Returns only metadata for collaboration signals - NO CONTENT
    */
   async getPublicNotesByIssue(issueKey) {
     try {
-      const query = `SELECT * FROM notes WHERE issue_key = ? AND is_public = TRUE ORDER BY created_at DESC`;
+      const query = `
+        SELECT n.id, n.title, n.created_by, n.created_at, n.deadline, n.status
+        FROM notes n
+        WHERE n.issue_key = ? AND n.is_public = TRUE 
+        ORDER BY n.created_at DESC
+      `;
       const result = await sql.prepare(query).bindParams(issueKey).execute();
 
       return result.rows || [];

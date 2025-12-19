@@ -353,14 +353,20 @@ function App() {
                 >
                   {note.status === 'open' ? 'Mark Complete' : 'Reopen'}
                 </Button>
-                {note.created_by === currentUser && (
+                
+                {/* Edit button - show if user has write permissions or is owner */}
+                {(note.permissions?.canEdit || note.permissions?.isOwner) && (
+                  <Button
+                    appearance="subtle"
+                    onClick={() => openEditModal(note)}
+                  >
+                    Edit
+                  </Button>
+                )}
+
+                {/* Share and Delete - only for owners */}
+                {note.permissions?.isOwner && (
                   <>
-                    <Button
-                      appearance="subtle"
-                      onClick={() => openEditModal(note)}
-                    >
-                      Edit
-                    </Button>
                     <Button
                       appearance="subtle"
                       onClick={() => openShareModal(note)}
