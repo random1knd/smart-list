@@ -9,6 +9,16 @@ modules:
     # Backend resolver for all note and notification operations
     - key: notes-resolver
       handler: index.handler
+    
+    # Scheduled function for checking and sending notifications
+    - key: notification-scheduler
+      handler: scheduled.handler
+  
+  # Scheduled trigger - runs every 5 minutes to check for deadline notifications
+  scheduledTrigger:
+    - key: notification-check-trigger
+      function: notification-scheduler
+      interval: fiveMinute
 
   # Issue Panel module - main UI for managing private notes
   jira:issuePanel:

@@ -23,6 +23,21 @@ import '@atlaskit/css-reset';
 
 import './App.css';
 
+// Generate time options in 5-minute intervals (00:00 to 23:55)
+const generateTimeIntervals = () => {
+  const times = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 5) {
+      const h = hour.toString().padStart(2, '0');
+      const m = minute.toString().padStart(2, '0');
+      times.push(`${h}:${m}`);
+    }
+  }
+  return times;
+};
+
+const TIME_INTERVALS_5MIN = generateTimeIntervals();
+
 function App() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -426,6 +441,12 @@ function App() {
                   value={deadline}
                   onChange={setDeadline}
                   placeholder="Select deadline"
+                  datePickerProps={{
+                    minDate: new Date().toISOString().split('T')[0]
+                  }}
+                  timePickerProps={{
+                    times: TIME_INTERVALS_5MIN
+                  }}
                 />
               </div>
 
@@ -496,6 +517,12 @@ function App() {
                   value={deadline}
                   onChange={setDeadline}
                   placeholder="Select deadline"
+                  datePickerProps={{
+                    minDate: new Date().toISOString().split('T')[0]
+                  }}
+                  timePickerProps={{
+                    times: TIME_INTERVALS_5MIN
+                  }}
                 />
               </div>
 

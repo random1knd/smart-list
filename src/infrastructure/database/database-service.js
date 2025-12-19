@@ -261,6 +261,92 @@ class DatabaseService {
       return false;
     }
   }
+
+  /**
+   * Create a new notification
+   */
+  async createNotification(notificationData) {
+    try {
+      const query = `
+        INSERT INTO notifications (user_account_id, note_id, type, title, message, is_read)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+      const result = await sql.prepare(query).bindParams(
+        notificationData.user_account_id,
+        notificationData.note_id,
+        notificationData.type,
+        notificationData.title,
+        notificationData.message,
+        notificationData.is_read || false
+      ).execute();
+
+      return {
+        id: result.lastInsertId,
+        ...notificationData
+      };
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all pending (unread) notifications
+   */
+  async getPendingNotifications() {
+    try {
+      const query = `
+        SELECT * FROM notifications 
+        WHERE is_read = FALSE 
+        ORDER BY created_at ASC
+      `;
+      const result = await sql.prepare(query).execute();
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error getting pending notifications:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get note permissions for notification purposes
+   */
+  async getNotePermissions(noteId) {
+    try {
+      const query = `SELECT * FROM note_permissions WHERE note_id = ?`;
+      const result = await sql.prepare(query).bindParams(noteId).execute();
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error getting note permissions:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete all notifications for a specific note
+   */
+  async deleteNotificationsByNoteId(noteId) {
+    try {
+      const query = `DELETE FROM notifications WHERE note_id = ?`;
+      await sql.prepare(query).bindParams(noteId).execute();
+    } catch (error) {
+      console.error('Error deleting notifications by note id:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mark a notification as read
+   */
+  async markNotificationAsRead(notificationId) {
+    try {
+      const query = `UPDATE notifications SET is_read = TRUE WHERE id = ?`;
+      await sql.prepare(query).bindParams(notificationId).execute();
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new DatabaseService();

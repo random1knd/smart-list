@@ -1,4 +1,5 @@
 const databaseService = require('../../infrastructure/database/database-service');
+const notificationService = require('./notification-service');
 const api = require('@forge/api');
 
 /**
@@ -25,6 +26,16 @@ class NotesService {
       deadline: deadline || null,
       isPublic: isPublic || false
     });
+
+    // Create deadline notification if deadline is set
+    if (deadline) {
+      try {
+        await notificationService.createDeadlineNotification(note.id, deadline, userId, issueKey);
+      } catch (error) {
+        console.error('Failed to create notification:', error);
+        // Don't fail the note creation if notification fails
+      }
+    }
 
     return note;
   }
@@ -66,6 +77,11 @@ class NotesService {
       throw new Error('Access denied - write permission required');
     }
 
+    const note = await databaseService.getNoteById(noteId);
+    if (!note) {
+      throw new Error('Note not found');
+    }
+
     const updates = {};
 
     if (title !== undefined) {
@@ -94,7 +110,24 @@ class NotesService {
       updates.status = status;
     }
 
-    return await databaseService.updateNote(noteId, updates);
+    const updatedNote = await databaseService.updateNote(noteId, updates);
+
+    // Update notifications if deadline changed
+    if (deadline !== undefined) {
+      try {
+        await notificationService.updateNotificationsForDeadline(
+          noteId, 
+          deadline, 
+          note.created_by, 
+          note.issue_key
+        );
+      } catch (error) {
+        console.error('Failed to update notifications:', error);
+        // Don't fail the update if notification fails
+      }
+    }
+
+    return updatedNote;
   }
 
   /**
@@ -109,6 +142,14 @@ class NotesService {
 
     if (note.created_by !== userId) {
       throw new Error('Only the note owner can delete it');
+    }
+
+    // Delete associated notifications
+    try {
+      await notificationService.deleteNotificationsForNote(noteId);
+    } catch (error) {
+      console.error('Failed to delete notifications:', error);
+      // Continue with note deletion even if notification deletion fails
     }
 
     return await databaseService.deleteNote(noteId);
