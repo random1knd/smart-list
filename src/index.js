@@ -50,7 +50,21 @@ resolver.define('createNote', async (req) => {
       userId
     });
 
-    return { note, success: true };
+    // Map snake_case to camelCase for frontend
+    const mappedNote = {
+      id: note.id,
+      issueKey: note.issue_key,
+      title: note.title,
+      content: note.content,
+      createdBy: note.created_by,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+      deadline: note.deadline,
+      isPublic: note.is_public,
+      status: note.status
+    };
+
+    return { note: mappedNote, success: true };
   } catch (error) {
     console.error('Error in createNote resolver:', error);
     return { error: error.message, success: false };
@@ -64,7 +78,22 @@ resolver.define('getNoteById', async (req) => {
     const userId = req.context.accountId;
 
     const note = await notesService.getNoteById(noteId, userId);
-    return { note, success: true };
+    
+    // Map snake_case to camelCase for frontend
+    const mappedNote = {
+      id: note.id,
+      issueKey: note.issue_key,
+      title: note.title,
+      content: note.content,
+      createdBy: note.created_by,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+      deadline: note.deadline,
+      isPublic: note.is_public,
+      status: note.status
+    };
+    
+    return { note: mappedNote, success: true };
   } catch (error) {
     console.error('Error in getNoteById resolver:', error);
     return { error: error.message, success: false, note: null };
@@ -79,14 +108,23 @@ resolver.define('getNotesByIssue', async (req) => {
 
     const notes = await notesService.getNotesByIssue(issueKey, userId);
 
-    // Add permission information for each note
+    // Add permission information for each note and map snake_case to camelCase
     const notesWithPermissions = await Promise.all(
       notes.map(async (note) => {
         const canEdit = await databaseService.hasPermission(note.id, userId, 'write');
         const canRead = await databaseService.hasPermission(note.id, userId, 'read');
         
         return {
-          ...note,
+          id: note.id,
+          issueKey: note.issue_key,
+          title: note.title,
+          content: note.content,
+          createdBy: note.created_by,
+          createdAt: note.created_at,
+          updatedAt: note.updated_at,
+          deadline: note.deadline,
+          isPublic: note.is_public,
+          status: note.status,
           permissions: {
             canEdit,
             canRead,
@@ -109,7 +147,22 @@ resolver.define('getMyNotes', async (req) => {
     const userId = req.context.accountId;
 
     const notes = await notesService.getMyNotes(userId);
-    return { notes, success: true };
+    
+    // Map snake_case to camelCase for frontend
+    const mappedNotes = notes.map(note => ({
+      id: note.id,
+      issueKey: note.issue_key,
+      title: note.title,
+      content: note.content,
+      createdBy: note.created_by,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+      deadline: note.deadline,
+      isPublic: note.is_public,
+      status: note.status
+    }));
+    
+    return { notes: mappedNotes, success: true };
   } catch (error) {
     console.error('Error in getMyNotes resolver:', error);
     return { error: error.message, success: false, notes: [] };
@@ -132,7 +185,21 @@ resolver.define('updateNote', async (req) => {
       userId
     });
 
-    return { note, success: true };
+    // Map snake_case to camelCase for frontend
+    const mappedNote = {
+      id: note.id,
+      issueKey: note.issue_key,
+      title: note.title,
+      content: note.content,
+      createdBy: note.created_by,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+      deadline: note.deadline,
+      isPublic: note.is_public,
+      status: note.status
+    };
+
+    return { note: mappedNote, success: true };
   } catch (error) {
     console.error('Error in updateNote resolver:', error);
     return { error: error.message, success: false };
@@ -222,6 +289,19 @@ resolver.define('getPublicNotesByIssue', async (req) => {
   } catch (error) {
     console.error('Error in getPublicNotesByIssue resolver:', error);
     return { error: error.message, success: false, notes: [] };
+  }
+});
+
+resolver.define('getPublicNoteActivities', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const { issueKey } = req.payload;
+
+    const activities = await notesService.getPublicNoteActivities(issueKey);
+    return { activities, success: true };
+  } catch (error) {
+    console.error('Error in getPublicNoteActivities resolver:', error);
+    return { error: error.message, success: false, activities: [] };
   }
 });
 

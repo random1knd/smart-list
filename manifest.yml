@@ -29,12 +29,24 @@ modules:
       viewportSize: large
       title: Private Notes
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
+  
+  # Issue Activity module - shows public note activities in the activity panel
+  jira:issueActivity:
+    - key: notes-activity
+      resource: activity
+      resolver:
+        function: notes-resolver
+      title: Notes Activity
 
 resources:
   - key: main
     path: static/notes/build
     tunnel:
       port: 3000
+  - key: activity
+    path: static/activity-panel/build
+    tunnel:
+      port: 3001
 permissions:
   content:
     styles:

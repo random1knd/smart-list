@@ -325,7 +325,7 @@ function App() {
       setDeadline('');
     }
     
-    setIsPublic(note.isPublic);
+    setIsPublic(!!note.isPublic); // Convert to boolean (handles 0/1 from database)
     setIsEditModalOpen(true);
   };
 
@@ -434,7 +434,7 @@ function App() {
                 <div className="note-title-row">
                   <h3>{note.title}</h3>
                   <div className="note-badges">
-                    {note.isPublic && (
+                    {!!note.isPublic && (
                       <Lozenge appearance="success">Public</Lozenge>
                     )}
                     {note.status === 'completed' && (

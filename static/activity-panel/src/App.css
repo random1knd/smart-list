@@ -35,16 +35,35 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  background-color: var(--activity-bg);
+  color: var(--activity-text);
 }
 
 .activity-error {
   padding: 12px;
   color: #DE350B;
   font-size: 14px;
+  background-color: var(--activity-bg);
 }
 
 .activity-empty {
   padding: 20px;
+  background-color: var(--activity-bg);
+  color: var(--activity-text);
+}
+
+/* Override Atlaskit EmptyState colors for dark mode */
+.activity-empty h4,
+.activity-empty h5,
+.activity-empty h6,
+.activity-empty p,
+.activity-empty span,
+.activity-empty div {
+  color: var(--activity-text) !important;
+}
+
+.activity-empty p {
+  color: var(--activity-text-subtle) !important;
 }
 
 .activity-note {
@@ -61,6 +80,22 @@
 }
 
 .activity-note:last-child {
+  margin-bottom: 0;
+}
+
+.activity-item {
+  background: var(--activity-surface);
+  border-left: 3px solid #0052CC;
+  padding: 12px;
+  margin-bottom: 12px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.activity-item:hover {
+  background-color: var(--activity-code-bg);
+}
+
+.activity-item:last-child {
   margin-bottom: 0;
 }
 
@@ -172,6 +207,22 @@
 .activity-time {
   font-size: 11px;
   color: var(--activity-text-subtle);
+}
+
+.activity-user {
+  font-size: 14px;
+  color: var(--activity-text);
+}
+
+.activity-description {
+  font-size: 13px;
+  color: var(--activity-text-subtle);
+  margin-top: 4px;
+}
+
+.activity-note-title {
+  color: var(--activity-text);
+  font-weight: 500;
 }
 
 /* Responsive design */

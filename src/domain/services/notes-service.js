@@ -257,6 +257,82 @@ class NotesService {
   }
 
   /**
+   * Get public note activities for an issue (for activity feed)
+   * Returns activity entries showing when public notes were created/updated
+   */
+  async getPublicNoteActivities(issueKey) {
+    try {
+      // Get all public notes for this issue
+      const notes = await databaseService.getPublicNotesByIssue(issueKey);
+      
+      if (!notes || notes.length === 0) {
+        return [];
+      }
+
+      // Fetch user information for all unique user IDs
+      const userIds = [...new Set(notes.map(note => note.created_by))];
+      const userMap = {};
+      
+      for (const userId of userIds) {
+        try {
+          const userResponse = await api.asUser().requestJira(api.route`/rest/api/3/user?accountId=${userId}`, {
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          
+          if (userResponse.ok) {
+            const user = await userResponse.json();
+            userMap[userId] = user.displayName || 'Unknown User';
+          } else {
+            userMap[userId] = 'Unknown User';
+          }
+        } catch (error) {
+          console.error(`Failed to fetch user ${userId}:`, error);
+          userMap[userId] = 'Unknown User';
+        }
+      }
+
+      // Create activity entries for each note
+      const activities = [];
+      
+      for (const note of notes) {
+        // Add "created" activity
+        activities.push({
+          id: `${note.id}-created`,
+          noteId: note.id,
+          noteTitle: note.title,
+          action: 'created',
+          userName: userMap[note.created_by] || 'Unknown User',
+          userId: note.created_by,
+          timestamp: note.created_at
+        });
+
+        // Add "updated" activity if the note was updated after creation
+        if (note.updated_at && note.updated_at !== note.created_at) {
+          activities.push({
+            id: `${note.id}-updated`,
+            noteId: note.id,
+            noteTitle: note.title,
+            action: 'updated',
+            userName: userMap[note.created_by] || 'Unknown User',
+            userId: note.created_by,
+            timestamp: note.updated_at
+          });
+        }
+      }
+
+      // Sort activities by timestamp (most recent first)
+      activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      return activities;
+    } catch (error) {
+      console.error('Error fetching public note activities:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get users in the project (for sharing)
    */
   async getProjectUsers(issueKey) {
