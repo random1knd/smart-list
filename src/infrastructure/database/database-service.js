@@ -27,13 +27,19 @@ class DatabaseService {
    */
   async createNote({ issueKey, title, content, createdBy, deadline, isPublic }) {
     try {
+      console.log('createNote called with deadline:', deadline, 'Type:', typeof deadline);
+      
       const query = `INSERT INTO notes (issue_key, title, content, created_by, deadline, is_public) VALUES (?, ?, ?, ?, ?, ?)`;
       const result = await sql.prepare(query)
         .bindParams(issueKey, title, content || '', createdBy, deadline, isPublic || false)
         .execute();
 
+      console.log('Insert result:', JSON.stringify(result, null, 2));
+
       if (result && result.rows && result.rows.insertId) {
-        return await this.getNoteById(result.rows.insertId);
+        const newNote = await this.getNoteById(result.rows.insertId);
+        console.log('Retrieved new note, deadline:', newNote.deadline);
+        return newNote;
       }
 
       throw new Error('Failed to create note');
@@ -74,6 +80,13 @@ class DatabaseService {
       `;
       const result = await sql.prepare(query).bindParams(issueKey, userId, userId).execute();
 
+      console.log('Database getNotesByIssue - Raw result from DB:');
+      if (result.rows && result.rows.length > 0) {
+        result.rows.forEach(row => {
+          console.log(`Row ID: ${row.id}, Deadline: ${row.deadline}, Type: ${typeof row.deadline}`);
+        });
+      }
+
       return result.rows || [];
     } catch (error) {
       console.error('Error getting notes by issue:', error);
@@ -101,6 +114,8 @@ class DatabaseService {
    */
   async updateNote(noteId, updates) {
     try {
+      console.log('updateNote called with updates:', JSON.stringify(updates, null, 2));
+      
       const setParts = [];
       const values = [];
 
@@ -113,6 +128,7 @@ class DatabaseService {
         values.push(updates.content);
       }
       if (updates.deadline !== undefined) {
+        console.log('Updating deadline to:', updates.deadline, 'Type:', typeof updates.deadline);
         setParts.push('deadline = ?');
         values.push(updates.deadline);
       }
@@ -133,9 +149,14 @@ class DatabaseService {
       const setClause = setParts.join(', ');
       const query = `UPDATE notes SET ${setClause} WHERE id = ?`;
 
+      console.log('Update query:', query);
+      console.log('Update values:', values);
+
       await sql.prepare(query).bindParams(...values).execute();
 
-      return await this.getNoteById(noteId);
+      const updatedNote = await this.getNoteById(noteId);
+      console.log('Updated note deadline:', updatedNote.deadline);
+      return updatedNote;
     } catch (error) {
       console.error('Error updating note:', error);
       throw error;

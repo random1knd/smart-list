@@ -10,19 +10,26 @@ const { ensureMigrationsApplied } = require('./migrations/runner');
 
 const resolver = new Resolver();
 
-// Ensure database migrations are applied on first use
-let migrationsChecked = false;
+/**
+ * Optimized migration check - only runs migrations once per app installation
+ * Uses Forge storage to track if migrations have been completed
+ */
 async function ensureDbInitialized(forceReset = false) {
-  if (!migrationsChecked || forceReset) {
-    try {
+  try {
+    // For force reset (debugging only)
+    if (forceReset) {
+      console.log('Force reset requested - running migrations');
       await ensureMigrationsApplied(forceReset);
-      migrationsChecked = true;
-      console.log('Database migrations check completed');
-    } catch (error) {
-      console.error('Database migrations failed:', error);
-      migrationsChecked = false; // Allow retry
-      throw error;
+      return;
     }
+    
+    // For normal operations, ensureMigrationsApplied already checks storage cache
+    // It will only run migrations if they haven't been run before
+    // This is fast because it checks storage flag first before doing any DB operations
+    await ensureMigrationsApplied(false);
+  } catch (error) {
+    console.error('Database initialization check failed:', error);
+    throw error;
   }
 }
 

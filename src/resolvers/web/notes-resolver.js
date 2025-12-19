@@ -75,6 +75,11 @@ resolver.define('getNotesByIssue', async (req) => {
     const issueKey = req.context.extension.issue.key;
 
     const notes = await notesService.getNotesByIssue(issueKey, userId);
+    
+    console.log('getNotesByIssue - Returning notes:');
+    notes.forEach(note => {
+      console.log(`Note ID: ${note.id}, Title: ${note.title}, Deadline: ${note.deadline}, Type: ${typeof note.deadline}`);
+    });
 
     return { notes, success: true };
   } catch (error) {

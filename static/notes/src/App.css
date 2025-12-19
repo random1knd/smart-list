@@ -1,9 +1,58 @@
+/* Theme variables matching Atlassian Design System */
+:root[data-theme="light"] {
+  --app-bg: #FFFFFF;
+  --app-surface: #FFFFFF;
+  --app-surface-raised: #FFFFFF;
+  --app-surface-overlay: #F4F5F7;
+  --app-border: #C1C7D0;
+  --app-border-light: #E0E0E0;
+  --app-text: #172B4D;
+  --app-text-subtle: #6B778C;
+  --app-text-subtlest: #8993A4;
+  --app-hover-bg: #F4F5F7;
+  --app-code-bg: #DFE1E6;
+  --app-code-block-bg: #172B4D;
+  --app-code-block-text: #FFFFFF;
+}
+
+:root[data-theme="dark"] {
+  --app-bg: #1D2125;
+  --app-surface: #22272B;
+  --app-surface-raised: #282E33;
+  --app-surface-overlay: #2C333A;
+  --app-border: #454F59;
+  --app-border-light: #38414A;
+  --app-text: #E6EAEF;
+  --app-text-subtle: #B6C2CF;
+  --app-text-subtlest: #8C9BAB;
+  --app-hover-bg: #38414A;
+  --app-code-bg: #38414A;
+  --app-code-block-bg: #161B22;
+  --app-code-block-text: #E6EAEF;
+}
+
+/* Apply theme to body and root elements */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+#root {
+  min-height: 100vh;
+  background-color: var(--app-bg);
+}
+
 .app-container {
   padding: 20px;
   max-width: 100%;
+  min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  background-color: var(--app-bg);
+  color: var(--app-text);
 }
 
 .header {
@@ -12,14 +61,14 @@
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .header h2 {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: #172B4D;
+  color: var(--app-text);
 }
 
 .loading-container {
@@ -32,7 +81,7 @@
 }
 
 .loading-container p {
-  color: #6B778C;
+  color: var(--app-text-subtle);
   font-size: 14px;
 }
 
@@ -43,17 +92,25 @@
 }
 
 .note-card {
-  background: #FFFFFF;
-  border: 2px solid #C1C7D0;
+  background: var(--app-surface-raised);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
 .note-card:hover {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-  border-color: #A5ADBA;
+  border-color: var(--app-border-light);
+}
+
+[data-theme="dark"] .note-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .note-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
 }
 
 .note-header {
@@ -71,7 +128,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #172B4D;
+  color: var(--app-text);
   flex: 1;
 }
 
@@ -86,15 +143,15 @@
   display: flex;
   gap: 16px;
   font-size: 12px;
-  color: #6B778C;
+  color: var(--app-text-subtle);
 }
 
 .note-content {
   margin: 16px 0;
   padding: 16px;
-  background: #F4F5F7;
+  background: var(--app-surface-overlay);
   border-radius: 4px;
-  color: #172B4D;
+  color: var(--app-text);
   line-height: 1.6;
   min-height: 60px;
 }
@@ -110,24 +167,26 @@
 }
 
 .note-content pre {
-  background: #172B4D;
-  color: #FFFFFF;
+  background: var(--app-code-block-bg);
+  color: var(--app-code-block-text);
   padding: 12px;
   border-radius: 4px;
   overflow-x: auto;
 }
 
 .note-content code {
-  background: #DFE1E6;
+  background: var(--app-code-bg);
   padding: 2px 6px;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 13px;
+  color: var(--app-text);
 }
 
 .note-content pre code {
   background: transparent;
   padding: 0;
+  color: var(--app-code-block-text);
 }
 
 .note-content table {
@@ -138,13 +197,13 @@
 
 .note-content table td,
 .note-content table th {
-  border: 1px solid #DFE1E6;
+  border: 1px solid var(--app-border);
   padding: 8px;
   text-align: left;
 }
 
 .note-content table th {
-  background: #F4F5F7;
+  background: var(--app-surface-overlay);
   font-weight: 600;
 }
 
@@ -165,7 +224,7 @@
   gap: 8px;
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid #E0E0E0;
+  border-top: 1px solid var(--app-border-light);
 }
 
 .form-field {
@@ -176,7 +235,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #172B4D;
+  color: var(--app-text);
   font-size: 14px;
 }
 
@@ -191,9 +250,10 @@
 }
 
 .ck.ck-editor__main > .ck-editor__editable {
-  background: #FFFFFF;
-  border: 2px solid #DFE1E6;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 3px;
+  color: var(--app-text);
 }
 
 .ck.ck-editor__main > .ck-editor__editable:focus {
@@ -202,15 +262,131 @@
 }
 
 .ck.ck-toolbar {
-  background: #F4F5F7;
-  border: 2px solid #DFE1E6;
+  background: var(--app-surface-overlay);
+  border: 1px solid var(--app-border);
   border-bottom: none;
   border-radius: 3px 3px 0 0;
+}
+
+/* CKEditor toolbar buttons in dark mode */
+[data-theme="dark"] .ck.ck-toolbar .ck-button {
+  color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .ck.ck-toolbar .ck-button:hover {
+  background: var(--app-hover-bg) !important;
+}
+
+[data-theme="dark"] .ck.ck-toolbar .ck-button.ck-on {
+  background: var(--app-hover-bg) !important;
+  color: #4C9AFF !important;
+}
+
+[data-theme="dark"] .ck.ck-dropdown__panel {
+  background: var(--app-surface-raised) !important;
+  border-color: var(--app-border) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .ck.ck-list__item {
+  color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .ck.ck-list__item:hover {
+  background: var(--app-hover-bg) !important;
+}
+
+[data-theme="dark"] .ck.ck-balloon-panel {
+  background: var(--app-surface-raised) !important;
+  border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] .ck.ck-tooltip {
+  background: var(--app-surface-raised) !important;
+  color: var(--app-text) !important;
+}
+
+/* Fix CKEditor content area text in dark mode */
+[data-theme="dark"] .ck.ck-editor__editable {
+  background: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="dark"] .ck.ck-editor__editable p,
+[data-theme="dark"] .ck.ck-editor__editable li,
+[data-theme="dark"] .ck.ck-editor__editable h1,
+[data-theme="dark"] .ck.ck-editor__editable h2,
+[data-theme="dark"] .ck.ck-editor__editable h3,
+[data-theme="dark"] .ck.ck-editor__editable div {
+  color: var(--app-text) !important;
+}
+
+/* Modal content in dark mode */
+[data-theme="dark"] [role="dialog"] {
+  background: var(--app-surface-raised) !important;
+  color: var(--app-text) !important;
+}
+
+/* Atlaskit TextField in dark mode */
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] textarea {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--app-text-subtlest) !important;
+}
+
+/* Atlaskit DateTimePicker in dark mode */
+[data-theme="dark"] [data-ds--text-field--container] {
+  background-color: var(--app-surface) !important;
+}
+
+[data-theme="dark"] [data-ds--text-field--input] {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+}
+
+/* Select dropdown in dark mode */
+[data-theme="dark"] [class*="control"] {
+  background-color: var(--app-surface) !important;
+  border-color: var(--app-border) !important;
+}
+
+[data-theme="dark"] [class*="singleValue"],
+[data-theme="dark"] [class*="placeholder"] {
+  color: var(--app-text) !important;
+}
+
+[data-theme="dark"] [class*="menu"] {
+  background-color: var(--app-surface-raised) !important;
+}
+
+[data-theme="dark"] [class*="option"] {
+  background-color: var(--app-surface-raised) !important;
+  color: var(--app-text) !important;
+}
+
+[data-theme="dark"] [class*="option"]:hover {
+  background-color: var(--app-hover-bg) !important;
 }
 
 /* Empty state styling */
 [data-testid="empty-state-container"] {
   padding: 60px 20px;
+}
+
+/* Fix EmptyState text visibility in dark mode */
+[data-theme="dark"] [data-testid="empty-state-container"] h4,
+[data-theme="dark"] [data-testid="empty-state-container"] h5,
+[data-theme="dark"] [data-testid="empty-state-container"] h6,
+[data-theme="dark"] [data-testid="empty-state-container"] p {
+  color: var(--app-text) !important;
 }
 
 /* Section message styling */
@@ -270,4 +446,26 @@
 /* Loading spinner centering */
 [data-testid="spinner"] {
   display: inline-block;
+}
+
+/* Fix all Atlaskit components text color in dark mode */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: var(--app-text);
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] div {
+  color: inherit;
+}
+
+/* Specific fixes for Atlaskit components that override colors */
+[data-theme="dark"] [data-ds--button--should-fit-container] span,
+[data-theme="dark"] button span {
+  color: inherit !important;
 }

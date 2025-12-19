@@ -1,8 +1,33 @@
+/* Theme variables matching Atlassian Design System */
+:root[data-theme="light"] {
+  --activity-bg: #FFFFFF;
+  --activity-surface: #FFFFFF;
+  --activity-border: #DFE1E6;
+  --activity-text: #172B4D;
+  --activity-text-subtle: #6B778C;
+  --activity-code-bg: #F4F5F7;
+  --activity-table-header-bg: #F4F5F7;
+  --activity-hover-shadow: rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="dark"] {
+  --activity-bg: #1D2125;
+  --activity-surface: #282E33;
+  --activity-border: #454F59;
+  --activity-text: #E6EAEF;
+  --activity-text-subtle: #B6C2CF;
+  --activity-code-bg: #38414A;
+  --activity-table-header-bg: #38414A;
+  --activity-hover-shadow: rgba(0, 0, 0, 0.3);
+}
+
 .activity-container {
   padding: 12px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  background-color: var(--activity-bg);
+  color: var(--activity-text);
 }
 
 .activity-loading {
@@ -23,8 +48,8 @@
 }
 
 .activity-note {
-  background: #FFFFFF;
-  border: 1px solid #DFE1E6;
+  background: var(--activity-surface);
+  border: 1px solid var(--activity-border);
   border-radius: 6px;
   padding: 12px;
   margin-bottom: 12px;
@@ -32,7 +57,7 @@
 }
 
 .activity-note:hover {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px var(--activity-hover-shadow);
 }
 
 .activity-note:last-child {
@@ -50,7 +75,7 @@
 .activity-title {
   flex: 1;
   font-size: 14px;
-  color: #172B4D;
+  color: var(--activity-text);
   font-weight: 600;
 }
 
@@ -64,7 +89,7 @@
 .activity-content {
   margin: 8px 0;
   font-size: 13px;
-  color: #172B4D;
+  color: var(--activity-text);
   line-height: 1.5;
 }
 
@@ -87,7 +112,7 @@
 }
 
 .activity-content pre {
-  background: #F4F5F7;
+  background: var(--activity-code-bg);
   padding: 8px;
   border-radius: 3px;
   overflow-x: auto;
@@ -95,7 +120,7 @@
 }
 
 .activity-content code {
-  background: #F4F5F7;
+  background: var(--activity-code-bg);
   padding: 2px 4px;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
@@ -116,13 +141,13 @@
 
 .activity-content table td,
 .activity-content table th {
-  border: 1px solid #DFE1E6;
+  border: 1px solid var(--activity-border);
   padding: 6px;
   text-align: left;
 }
 
 .activity-content table th {
-  background: #F4F5F7;
+  background: var(--activity-table-header-bg);
   font-weight: 600;
 }
 
@@ -141,12 +166,12 @@
 .activity-meta {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid #F4F5F7;
+  border-top: 1px solid var(--activity-border);
 }
 
 .activity-time {
   font-size: 11px;
-  color: #6B778C;
+  color: var(--activity-text-subtle);
 }
 
 /* Responsive design */

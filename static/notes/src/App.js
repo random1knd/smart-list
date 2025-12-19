@@ -44,6 +44,7 @@ function App() {
   const [error, setError] = useState(null);
   const [issueKey, setIssueKey] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [theme, setTheme] = useState('light');
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -82,8 +83,30 @@ function App() {
     const initialize = async () => {
       try {
         const context = await view.getContext();
+        console.log('Full context:', context);
         setIssueKey(context.extension.issue.key);
         setCurrentUser(context.accountId);
+        
+        // Get theme from context - try multiple possible locations
+        let currentTheme = 'light';
+        if (context.theme?.colorMode) {
+          currentTheme = context.theme.colorMode;
+          console.log('Theme from context.theme.colorMode:', currentTheme);
+        } else if (context.theme?.themeMode) {
+          currentTheme = context.theme.themeMode;
+          console.log('Theme from context.theme.themeMode:', currentTheme);
+        } else if (context.theme) {
+          console.log('Theme object exists but no colorMode/themeMode:', context.theme);
+        } else {
+          console.log('No theme in context, using default light theme');
+        }
+        
+        setTheme(currentTheme);
+        
+        // Apply theme to document root
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        console.log('Applied theme:', currentTheme);
+        
         await fetchNotes();
       } catch (err) {
         console.error('Failed to initialize:', err);
@@ -94,6 +117,27 @@ function App() {
     };
 
     initialize();
+    
+    // Listen for theme changes
+    try {
+      if (view.theme && view.theme.onThemeChanged) {
+        const themeListener = view.theme.onThemeChanged((newTheme) => {
+          console.log('Theme changed:', newTheme);
+          const mode = newTheme.colorMode || newTheme.themeMode || 'light';
+          setTheme(mode);
+          document.documentElement.setAttribute('data-theme', mode);
+        });
+
+        return () => {
+          // Cleanup listener if available
+          if (themeListener && typeof themeListener === 'function') {
+            themeListener();
+          }
+        };
+      }
+    } catch (err) {
+      console.log('Theme listener not available:', err);
+    }
   }, []);
 
   const fetchNotes = useCallback(async () => {
@@ -138,7 +182,7 @@ function App() {
         issueKey,
         title,
         content,
-        deadline: deadline || null,
+        deadline: formatDeadlineForBackend(deadline),
         isPublic,
       });
 
@@ -166,7 +210,7 @@ function App() {
         noteId: selectedNote.id,
         title,
         content,
-        deadline: deadline || null,
+        deadline: formatDeadlineForBackend(deadline),
         isPublic,
       });
 
@@ -247,10 +291,40 @@ function App() {
   };
 
   const openEditModal = (note) => {
+    console.log('Opening edit modal for note:', note);
+    console.log('Note deadline value:', note.deadline);
+    console.log('Note deadline type:', typeof note.deadline);
+    
     setSelectedNote(note);
     setTitle(note.title);
     setContent(note.content);
-    setDeadline(note.deadline || '');
+    
+    // Format deadline for DateTimePicker - it expects ISO 8601 format
+    if (note.deadline) {
+      // If deadline is already a valid ISO string, use it directly
+      // Otherwise convert it to ISO format
+      try {
+        const deadlineDate = new Date(note.deadline);
+        console.log('Parsed deadline date:', deadlineDate);
+        console.log('Is valid date:', !isNaN(deadlineDate.getTime()));
+        
+        if (!isNaN(deadlineDate.getTime())) {
+          const isoDeadline = deadlineDate.toISOString();
+          console.log('Setting deadline to ISO format:', isoDeadline);
+          setDeadline(isoDeadline);
+        } else {
+          console.log('Invalid date, setting to empty');
+          setDeadline('');
+        }
+      } catch (e) {
+        console.error('Invalid deadline format:', note.deadline, e);
+        setDeadline('');
+      }
+    } else {
+      console.log('No deadline on note, setting to empty');
+      setDeadline('');
+    }
+    
     setIsPublic(note.isPublic);
     setIsEditModalOpen(true);
   };
@@ -272,6 +346,36 @@ function App() {
     if (!dateString) return null;
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  // Helper function to format deadline for MySQL TIMESTAMP
+  const formatDeadlineForBackend = (deadlineString) => {
+    if (!deadlineString) return null;
+    
+    try {
+      // Parse the date string (handles various formats including ISO with timezone)
+      const date = new Date(deadlineString);
+      
+      if (isNaN(date.getTime())) {
+        console.error('Invalid deadline date:', deadlineString);
+        return null;
+      }
+      
+      // Format as MySQL TIMESTAMP: YYYY-MM-DD HH:MM:SS
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      
+      const formatted = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      console.log('Formatted deadline for backend:', formatted);
+      return formatted;
+    } catch (e) {
+      console.error('Error formatting deadline:', e);
+      return null;
+    }
   };
 
   const isDeadlineApproaching = (deadlineString) => {

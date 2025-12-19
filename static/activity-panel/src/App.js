@@ -10,12 +10,23 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
     const initialize = async () => {
       try {
         const context = await view.getContext();
         const issueKey = context.extension.issue.key;
+
+        // Get and apply theme from context
+        let currentTheme = 'light';
+        if (context.theme?.colorMode) {
+          currentTheme = context.theme.colorMode;
+        } else if (context.theme?.themeMode) {
+          currentTheme = context.theme.themeMode;
+        }
+        setTheme(currentTheme);
+        document.documentElement.setAttribute('data-theme', currentTheme);
 
         // Fetch public notes for this issue
         const response = await invoke('getPublicNotesByIssue', { issueKey });
@@ -29,6 +40,25 @@ function App() {
     };
 
     initialize();
+
+    // Listen for theme changes
+    try {
+      if (view.theme && view.theme.onThemeChanged) {
+        const themeListener = view.theme.onThemeChanged((newTheme) => {
+          const mode = newTheme.colorMode || newTheme.themeMode || 'light';
+          setTheme(mode);
+          document.documentElement.setAttribute('data-theme', mode);
+        });
+
+        return () => {
+          if (themeListener && typeof themeListener === 'function') {
+            themeListener();
+          }
+        };
+      }
+    } catch (err) {
+      console.log('Theme change listener not available:', err);
+    }
   }, []);
 
   const formatDate = (dateString) => {
