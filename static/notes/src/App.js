@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { invoke, view } from '@forge/bridge';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 import Button from '@atlaskit/button';
 import TextField from '@atlaskit/textfield';
@@ -65,18 +65,25 @@ function App() {
   const [permissionType, setPermissionType] = useState('read');
   const [loadingUsers, setLoadingUsers] = useState(false);
 
-  // CKEditor configuration - stable version without todoList
-  const editorConfig = {
+  // Quill editor configuration with todo list support
+  const quillModules = {
     toolbar: [
-      'undo', 'redo', '|',
-      'heading', '|',
-      'bold', 'italic', '|',
-      'link', 'blockQuote', '|',
-      'bulletedList', 'numberedList', '|',
-      'insertTable'
-    ],
-    placeholder: 'Start writing your note...'
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+      ['blockquote', 'code-block'],
+      ['link'],
+      ['clean']
+    ]
   };
+
+  const quillFormats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'check',
+    'blockquote', 'code-block',
+    'link'
+  ];
 
   // Fetch context and notes on mount
   useEffect(() => {
@@ -527,14 +534,14 @@ function App() {
 
               <div className="form-field">
                 <label htmlFor="content">Content</label>
-                <CKEditor
-                  editor={ClassicEditor}
-                  config={editorConfig}
-                  data={content}
-                  onChange={(event, editor) => {
-                    const data = editor.getData();
-                    setContent(data);
-                  }}
+                <ReactQuill
+                  theme="snow"
+                  value={content}
+                  onChange={setContent}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Start writing your note..."
+                  style={{ height: '200px', marginBottom: '50px' }}
                 />
               </div>
 
@@ -603,14 +610,14 @@ function App() {
 
               <div className="form-field">
                 <label htmlFor="edit-content">Content</label>
-                <CKEditor
-                  editor={ClassicEditor}
-                  config={editorConfig}
-                  data={content}
-                  onChange={(event, editor) => {
-                    const data = editor.getData();
-                    setContent(data);
-                  }}
+                <ReactQuill
+                  theme="snow"
+                  value={content}
+                  onChange={setContent}
+                  modules={quillModules}
+                  formats={quillFormats}
+                  placeholder="Start writing your note..."
+                  style={{ height: '200px', marginBottom: '50px' }}
                 />
               </div>
 
