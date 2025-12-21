@@ -467,10 +467,9 @@ function App() {
                 </div>
               </div>
 
-              <div
-                className="note-content"
-                dangerouslySetInnerHTML={{ __html: note.content }}
-              />
+              <div className="note-content ql-editor">
+                <div dangerouslySetInnerHTML={{ __html: note.content }} />
+              </div>
 
               <div className="note-actions">
                 <Button
