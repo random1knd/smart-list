@@ -27,7 +27,9 @@
       "Bash(forge lint:*)",
       "Bash(del staticactivity-panel.eslintrc.json)",
       "Bash(npm audit:*)",
-      "Bash(npm update:*)"
+      "Bash(npm update:*)",
+      "Bash(copy \"static\\\\project-page\\\\src\\\\App.css\" \"static\\\\global-page\\\\src\\\\App.css\")",
+      "Bash(forge install:*)"
     ],
     "deny": [],
     "ask": []

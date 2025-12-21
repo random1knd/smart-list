@@ -68,6 +68,13 @@ class NotesService {
   }
 
   /**
+   * Get all notes for a project that the user can access
+   */
+  async getNotesForProject(projectKey, userId) {
+    return await databaseService.getNotesForProject(projectKey, userId);
+  }
+
+  /**
    * Update a note (with permission check)
    */
   async updateNote({ noteId, title, content, deadline, isPublic, status, userId }) {

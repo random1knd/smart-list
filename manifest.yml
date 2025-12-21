@@ -13,6 +13,26 @@ modules:
     # Scheduled function for checking and sending notifications
     - key: notification-scheduler
       handler: scheduled.handler
+    
+    # JQL function for searching issues with notes
+    - key: jql-notes-function
+      handler: jqlHandler.handler
+    
+    # JQL function for note count filtering
+    - key: jql-notes-count
+      handler: jqlHandler.countHandler
+    
+    # JQL function for notes after date
+    - key: jql-notes-after
+      handler: jqlHandler.afterHandler
+    
+    # JQL function for notes before date
+    - key: jql-notes-before
+      handler: jqlHandler.beforeHandler
+    
+    # JQL function for notes in date range
+    - key: jql-notes-range
+      handler: jqlHandler.rangeHandler
   
   # Scheduled trigger - runs every 5 minutes to check for deadline notifications
   scheduledTrigger:
@@ -38,6 +58,104 @@ modules:
         function: notes-resolver
       title: Notes Activity
 
+  # Project Settings Page - view and manage notes at project level
+  jira:projectSettingsPage:
+    - key: notes-project-page
+      resource: project-page
+      resolver:
+        function: notes-resolver
+      title: Private Notes
+
+  # Global Page - view and manage notes across all projects
+  jira:globalPage:
+    - key: notes-global-page
+      resource: global-page
+      resolver:
+        function: notes-resolver
+      title: Private Notes
+      location: system.top.navigation.bar
+
+  # JQL Functions - search for issues with notes
+  jira:jqlFunction:
+    # Basic function - find all issues with notes
+    - key: issues-with-notes-v2
+      name: issuesWithNotes
+      description: Find issues that have private notes
+      arguments: []
+      types:
+        - issue
+      operators:
+        - "in"
+        - "not in"
+      function: jql-notes-function
+    
+    # Count-based function - find issues with specific note counts
+    - key: issues-with-notes-count
+      name: issuesWithNotesCount
+      description: Find issues based on note count (e.g., ">", 3 for more than 3 notes)
+      arguments:
+        - name: operator
+          description: Comparison operator (">", "<", ">=", "<=", "=")
+          required: true
+        - name: count
+          description: Number to compare against
+          required: true
+      types:
+        - issue
+      operators:
+        - "in"
+        - "not in"
+      function: jql-notes-count
+    
+    # Date-based function - notes after a date
+    - key: issues-with-notes-after
+      name: issuesWithNotesAfter
+      description: Find issues with notes created after a specific date (YYYY-MM-DD)
+      arguments:
+        - name: date
+          description: Date in YYYY-MM-DD format
+          required: true
+      types:
+        - issue
+      operators:
+        - "in"
+        - "not in"
+      function: jql-notes-after
+    
+    # Date-based function - notes before a date
+    - key: issues-with-notes-before
+      name: issuesWithNotesBefore
+      description: Find issues with notes created before a specific date (YYYY-MM-DD)
+      arguments:
+        - name: date
+          description: Date in YYYY-MM-DD format
+          required: true
+      types:
+        - issue
+      operators:
+        - "in"
+        - "not in"
+      function: jql-notes-before
+    
+    # Date-based function - notes within a date range
+    - key: issues-with-notes-in-range
+      name: issuesWithNotesInDateRange
+      description: Find issues with notes created within a date range (YYYY-MM-DD, YYYY-MM-DD)
+      arguments:
+        - name: startDate
+          description: Start date in YYYY-MM-DD format
+          required: true
+        - name: endDate
+          description: End date in YYYY-MM-DD format
+          required: true
+      types:
+        - issue
+      operators:
+        - "in"
+        - "not in"
+      function: jql-notes-range
+
+
 resources:
   - key: main
     path: static/notes/build
@@ -47,6 +165,14 @@ resources:
     path: static/activity-panel/build
     tunnel:
       port: 3001
+  - key: project-page
+    path: static/project-page/build
+    tunnel:
+      port: 3002
+  - key: global-page
+    path: static/global-page/build
+    tunnel:
+      port: 3003
 permissions:
   content:
     styles:

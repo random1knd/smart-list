@@ -331,6 +331,204 @@ resolver.define('getProjectUsers', async (req) => {
   }
 });
 
+// ===== Project Page Resolvers =====
+
+resolver.define('getProjectNotes', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const projectKey = req.payload?.projectKey || req.context?.extension?.project?.key;
+    const userId = req.context.accountId;
+
+    if (!projectKey) {
+      throw new Error('No project key available');
+    }
+
+    const notes = await notesService.getNotesForProject(projectKey, userId);
+
+    // Add permission information for each note and map snake_case to camelCase
+    const notesWithPermissions = await Promise.all(
+      notes.map(async (note) => {
+        const canEdit = await databaseService.hasPermission(note.id, userId, 'write');
+        const canRead = await databaseService.hasPermission(note.id, userId, 'read');
+
+        return {
+          id: note.id,
+          issueKey: note.issue_key,
+          title: note.title,
+          content: note.content,
+          createdBy: note.created_by,
+          createdAt: note.created_at,
+          updatedAt: note.updated_at,
+          deadline: note.deadline,
+          isPublic: note.is_public,
+          status: note.status,
+          permissions: {
+            canEdit,
+            canRead,
+            isOwner: note.created_by === userId
+          }
+        };
+      })
+    );
+
+    return { notes: notesWithPermissions, success: true };
+  } catch (error) {
+    console.error('Error in getProjectNotes resolver:', error);
+    return { error: error.message, success: false, notes: [] };
+  }
+});
+
+resolver.define('getProjectStatistics', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const projectKey = req.payload?.projectKey || req.context?.extension?.project?.key;
+    const userId = req.context.accountId;
+
+    if (!projectKey) {
+      throw new Error('No project key available');
+    }
+
+    const statistics = await databaseService.getNotesStatistics(userId, projectKey);
+    return { statistics, success: true };
+  } catch (error) {
+    console.error('Error in getProjectStatistics resolver:', error);
+    return { error: error.message, success: false, statistics: null };
+  }
+});
+
+resolver.define('getProjectUpcomingDeadlines', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const { projectKey, limit = 10 } = req.payload || {};
+    const userId = req.context.accountId;
+
+    const notes = await databaseService.getUpcomingDeadlines(userId, projectKey, limit);
+
+    // Map snake_case to camelCase
+    const mappedNotes = notes.map(note => ({
+      id: note.id,
+      issueKey: note.issue_key,
+      title: note.title,
+      content: note.content,
+      createdBy: note.created_by,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+      deadline: note.deadline,
+      isPublic: note.is_public,
+      status: note.status
+    }));
+
+    return { notes: mappedNotes, success: true };
+  } catch (error) {
+    console.error('Error in getProjectUpcomingDeadlines resolver:', error);
+    return { error: error.message, success: false, notes: [] };
+  }
+});
+
+// ===== Global Page Resolvers =====
+
+resolver.define('getGlobalNotes', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const userId = req.context.accountId;
+
+    const notes = await databaseService.getAllNotesForUser(userId);
+
+    // Add permission information for each note and map snake_case to camelCase
+    const notesWithPermissions = await Promise.all(
+      notes.map(async (note) => {
+        const canEdit = await databaseService.hasPermission(note.id, userId, 'write');
+        const canRead = await databaseService.hasPermission(note.id, userId, 'read');
+
+        return {
+          id: note.id,
+          issueKey: note.issue_key,
+          title: note.title,
+          content: note.content,
+          createdBy: note.created_by,
+          createdAt: note.created_at,
+          updatedAt: note.updated_at,
+          deadline: note.deadline,
+          isPublic: note.is_public,
+          status: note.status,
+          permissions: {
+            canEdit,
+            canRead,
+            isOwner: note.created_by === userId
+          }
+        };
+      })
+    );
+
+    return { notes: notesWithPermissions, success: true };
+  } catch (error) {
+    console.error('Error in getGlobalNotes resolver:', error);
+    return { error: error.message, success: false, notes: [] };
+  }
+});
+
+resolver.define('getGlobalStatistics', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const userId = req.context.accountId;
+
+    const statistics = await databaseService.getNotesStatistics(userId, null);
+    return { statistics, success: true };
+  } catch (error) {
+    console.error('Error in getGlobalStatistics resolver:', error);
+    return { error: error.message, success: false, statistics: null };
+  }
+});
+
+resolver.define('getGlobalUpcomingDeadlines', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const { limit = 10 } = req.payload || {};
+    const userId = req.context.accountId;
+
+    const notes = await databaseService.getUpcomingDeadlines(userId, null, limit);
+
+    // Map snake_case to camelCase
+    const mappedNotes = notes.map(note => ({
+      id: note.id,
+      issueKey: note.issue_key,
+      title: note.title,
+      content: note.content,
+      createdBy: note.created_by,
+      createdAt: note.created_at,
+      updatedAt: note.updated_at,
+      deadline: note.deadline,
+      isPublic: note.is_public,
+      status: note.status
+    }));
+
+    return { notes: mappedNotes, success: true };
+  } catch (error) {
+    console.error('Error in getGlobalUpcomingDeadlines resolver:', error);
+    return { error: error.message, success: false, notes: [] };
+  }
+});
+
+// ===== JQL Custom Field Resolver =====
+
+resolver.define('getNotesCountField', async (req) => {
+  try {
+    await ensureDbInitialized();
+    const issueKey = req.context?.extension?.issue?.key;
+    const userId = req.context.accountId;
+
+    if (!issueKey) {
+      return { value: 0 };
+    }
+
+    const count = await databaseService.getNotesCountForIssue(issueKey, userId);
+    return { value: count };
+  } catch (error) {
+    console.error('Error in getNotesCountField resolver:', error);
+    return { value: 0 };
+  }
+});
+
 // ===== Notification Resolvers (placeholders) =====
 
 resolver.define('getMyNotifications', async (req) => {
@@ -379,3 +577,4 @@ resolver.define('resetMigrations', async (req) => {
 });
 
 exports.handler = resolver.getDefinitions();
+

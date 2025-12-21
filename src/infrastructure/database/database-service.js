@@ -284,6 +284,194 @@ class DatabaseService {
   }
 
   /**
+   * Get count of notes for an issue that the user can access
+   * Used for JQL custom field and statistics
+   */
+  async getNotesCountForIssue(issueKey, userId) {
+    try {
+      console.log(`[getNotesCountForIssue] START - Issue: ${issueKey}, User: ${userId}`);
+      
+      const query = `
+        SELECT COUNT(DISTINCT n.id) as count
+        FROM notes n
+        LEFT JOIN note_permissions np ON n.id = np.note_id
+        WHERE n.issue_key = ?
+          AND (n.created_by = ? OR np.user_account_id = ?)
+      `;
+      
+      console.log(`[getNotesCountForIssue] Executing query with params:`, issueKey, userId, userId);
+      const result = await sql.prepare(query).bindParams(issueKey, userId, userId).execute();
+      
+      console.log(`[getNotesCountForIssue] Raw result:`, JSON.stringify(result.rows));
+      const count = result.rows.length > 0 ? result.rows[0].count : 0;
+      console.log(`[getNotesCountForIssue] Returning count: ${count}`);
+      
+      return count;
+    } catch (error) {
+      console.error('Error getting notes count for issue:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all notes across all issues that the user can access
+   * Used for global page view
+   */
+  async getAllNotesForUser(userId) {
+    try {
+      const query = `
+        SELECT DISTINCT n.*
+        FROM notes n
+        LEFT JOIN note_permissions np ON n.id = np.note_id
+        WHERE (n.created_by = ? OR np.user_account_id = ?)
+        ORDER BY n.created_at DESC
+      `;
+      const result = await sql.prepare(query).bindParams(userId, userId).execute();
+      
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error getting all notes for user:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all notes for a project that the user can access
+   * Used for project page view
+   */
+  async getNotesForProject(projectKey, userId) {
+    try {
+      const query = `
+        SELECT DISTINCT n.*
+        FROM notes n
+        LEFT JOIN note_permissions np ON n.id = np.note_id
+        WHERE n.issue_key LIKE ?
+          AND (n.created_by = ? OR np.user_account_id = ?)
+        ORDER BY n.created_at DESC
+      `;
+      const result = await sql.prepare(query).bindParams(`${projectKey}-%`, userId, userId).execute();
+      
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error getting notes for project:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get statistics for notes that the user can access
+   * Returns counts by various categories
+   */
+  async getNotesStatistics(userId, projectKey = null) {
+    try {
+      // Base query for user-accessible notes
+      let whereClause = '(n.created_by = ? OR np.user_account_id = ?)';
+      const params = [userId, userId];
+      
+      if (projectKey) {
+        whereClause += ' AND n.issue_key LIKE ?';
+        params.push(`${projectKey}-%`);
+      }
+      
+      // Get total count
+      const countQuery = `
+        SELECT COUNT(DISTINCT n.id) as total_count
+        FROM notes n
+        LEFT JOIN note_permissions np ON n.id = np.note_id
+        WHERE ${whereClause}
+      `;
+      const countResult = await sql.prepare(countQuery).bindParams(...params).execute();
+      const totalCount = countResult.rows[0]?.total_count || 0;
+      
+      // Get count of notes created by user
+      const myNotesQuery = `
+        SELECT COUNT(*) as my_count
+        FROM notes
+        WHERE created_by = ?
+        ${projectKey ? 'AND issue_key LIKE ?' : ''}
+      `;
+      const myNotesParams = projectKey ? [userId, `${projectKey}-%`] : [userId];
+      const myNotesResult = await sql.prepare(myNotesQuery).bindParams(...myNotesParams).execute();
+      const myCount = myNotesResult.rows[0]?.my_count || 0;
+      
+      // Get count of notes shared with user (not created by them)
+      const sharedQuery = `
+        SELECT COUNT(DISTINCT np.note_id) as shared_count
+        FROM note_permissions np
+        JOIN notes n ON np.note_id = n.id
+        WHERE np.user_account_id = ?
+          AND n.created_by != ?
+          ${projectKey ? 'AND n.issue_key LIKE ?' : ''}
+      `;
+      const sharedParams = projectKey ? [userId, userId, `${projectKey}-%`] : [userId, userId];
+      const sharedResult = await sql.prepare(sharedQuery).bindParams(...sharedParams).execute();
+      const sharedCount = sharedResult.rows[0]?.shared_count || 0;
+      
+      // Get count of upcoming deadlines (next 7 days)
+      const now = new Date();
+      const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const deadlineQuery = `
+        SELECT COUNT(DISTINCT n.id) as deadline_count
+        FROM notes n
+        LEFT JOIN note_permissions np ON n.id = np.note_id
+        WHERE ${whereClause}
+          AND n.deadline IS NOT NULL
+          AND n.deadline >= ?
+          AND n.deadline <= ?
+      `;
+      const deadlineParams = [...params, now.toISOString(), nextWeek.toISOString()];
+      const deadlineResult = await sql.prepare(deadlineQuery).bindParams(...deadlineParams).execute();
+      const upcomingDeadlines = deadlineResult.rows[0]?.deadline_count || 0;
+      
+      return {
+        totalCount,
+        myCount,
+        sharedCount,
+        upcomingDeadlines
+      };
+    } catch (error) {
+      console.error('Error getting notes statistics:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get notes with upcoming deadlines for a user
+   * Sorted by deadline (soonest first)
+   */
+  async getUpcomingDeadlines(userId, projectKey = null, limit = 10) {
+    try {
+      let whereClause = '(n.created_by = ? OR np.user_account_id = ?)';
+      const params = [userId, userId];
+      
+      if (projectKey) {
+        whereClause += ' AND n.issue_key LIKE ?';
+        params.push(`${projectKey}-%`);
+      }
+      
+      const query = `
+        SELECT DISTINCT n.*
+        FROM notes n
+        LEFT JOIN note_permissions np ON n.id = np.note_id
+        WHERE ${whereClause}
+          AND n.deadline IS NOT NULL
+          AND n.deadline >= ?
+        ORDER BY n.deadline ASC
+        LIMIT ?
+      `;
+      
+      const now = new Date().toISOString();
+      params.push(now, limit);
+      
+      const result = await sql.prepare(query).bindParams(...params).execute();
+      return result.rows || [];
+    } catch (error) {
+      console.error('Error getting upcoming deadlines:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Create a new notification
    */
   async createNotification(notificationData) {
