@@ -58,23 +58,6 @@ modules:
         function: notes-resolver
       title: Notes Activity
 
-  # Project Settings Page - view and manage notes at project level
-  jira:projectSettingsPage:
-    - key: notes-project-page
-      resource: project-page
-      resolver:
-        function: notes-resolver
-      title: Private Notes
-
-  # Global Page - view and manage notes across all projects
-  jira:globalPage:
-    - key: notes-global-page
-      resource: global-page
-      resolver:
-        function: notes-resolver
-      title: Private Notes
-      location: system.top.navigation.bar
-
   # JQL Functions - search for issues with notes
   jira:jqlFunction:
     # Basic function - find all issues with notes
@@ -165,14 +148,6 @@ resources:
     path: static/activity-panel/build
     tunnel:
       port: 3001
-  - key: project-page
-    path: static/project-page/build
-    tunnel:
-      port: 3002
-  - key: global-page
-    path: static/global-page/build
-    tunnel:
-      port: 3003
 permissions:
   content:
     styles:

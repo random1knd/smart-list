@@ -1,0 +1,154 @@
+From "No Way" to "Let's Go": Building a Production Jira App in One Week with Rovo Dev CLI
+
+The Challenge: One Week, Big Ambitions
+
+When I first heard about Codegeist, I was excited—but there was one problem. The deadline was just a week away, and I had a complex app idea in mind: a full-featured Private Notes system for Jira with sharing capabilities, deadline notifications, and advanced JQL search functions. With my already tight schedule, building this from scratch seemed impossible. I almost didn't even try.
+
+But I'd been following Rovo for a while, and I thought: "Why not give Rovo Dev CLI a shot?" If there was ever a time to test AI-assisted development, this was it. Spoiler alert: that decision changed everything.
+
+The Rocky Start: Not All AI is Created Equal
+
+I'll be honest—the first few hours weren't promising. The code Rovo Dev CLI generated initially didn't quite fit Forge's context. I was getting generic React code, patterns that wouldn't work with Forge's unique architecture, and suggestions that showed a lack of understanding of the platform's constraints.
+
+I was starting to think, "Here we go, another AI tool that promises the moon but delivers boilerplate."
+
+The Game Changer: MCP Server Integration
+
+Then I discovered something while digging through the configuration files: MCP (Model Context Protocol) server support. Rovo Dev CLI had the ability to hook into specialized context servers, and there was one specifically for Forge development.
+
+I connected the Forge MCP server to Rovo Dev CLI, and suddenly, everything clicked.
+
+The quality of the code transformed instantly. Instead of generic React patterns, I was getting proper Forge resolver implementations. Instead of guessing at Forge SQL syntax, it knew the exact limitations and best practices. It understood that I needed @forge/react components, not standard React. It knew about Forge's security model with asUser() and asApp(). It even understood the nuances of the manifest.yml structure.
+
+This wasn't just an improvement—it was a revelation. The code went from "I need to fix this" to "I need to review this" (and usually it was already right).
+
+The Secret Weapon: Custom Prompts
+
+But here's what really made me feel like a 10x developer: the additional prompt configuration feature. This might sound like a small thing, but it was HUGE.
+
+I set up a custom prompt that included my coding preferences, architecture patterns, and specific guidelines for this project. Every time Rovo Dev CLI generated code, it incorporated these instructions automatically. 
+
+The result? The code didn't just work—it matched my style, followed my architectural decisions, and felt like something I would have written myself (but faster, and often with fewer bugs). It was like having a junior developer who actually listened to code review feedback and applied it to all future work.
+
+From Architecture to Implementation: AI as a True Partner
+
+Here's where things got really interesting. I didn't just use Rovo Dev CLI for coding—I used it throughout the entire development lifecycle:
+
+**Architecture Planning**: I described my app concept, and Rovo Dev CLI helped me design the database schema, plan the module structure, and think through the permission model. It suggested using Forge SQL with AUTO_RANDOM for primary keys to avoid hotspot issues—a nuance I might have missed.
+
+**Feature Suggestions**: After getting the core notes functionality working, I asked Rovo Dev CLI what would make the app better. It suggested implementing JQL functions. 
+
+Now, I'll be honest—I'd never built custom JQL functions before. Understanding how they work, how to register them in the manifest, how to implement the handlers with proper error handling... that could have easily been a multi-day learning curve. With Rovo Dev CLI, it was done in an hour. Not just basic functionality, either—I ended up with five different JQL functions (basic search, count-based filtering, and three date-based searches) with comprehensive error handling and documentation.
+
+**Dark Mode in One Prompt**: Then came what I call my "magic moment." I typed: "Make a dark mode for this app." That's it. One prompt.
+
+What I got back wasn't just some basic CSS variables. Rovo Dev CLI analyzed my entire component structure, identified all the UI elements, created comprehensive CSS custom properties for both light and dark themes, handled the CKEditor integration (which is notoriously tricky to theme), fixed Atlaskit component overrides, and even ensured proper contrast ratios for accessibility.
+
+I tested it. It worked. First try. I genuinely felt like a 10x developer at that moment.
+
+Granular Control: The Best of Both Worlds
+
+One concern I had about AI-assisted development was losing control over my codebase. Would it rewrite working code? Would it break things that didn't need fixing?
+
+Rovo Dev CLI's approach is brilliant here. Before making changes, it shows you exactly what files it plans to modify. You can review, accept, reject, or adjust. This granular control meant I could confidently let it handle the tedious parts while I maintained oversight of the critical pieces.
+
+When I asked it to add a feature, it only touched the relevant files. When I asked it to fix a bug, it didn't refactor my entire codebase. This surgical precision made me trust it more and more as the week went on.
+
+The Autonomous Debugger: Better Than a Senior Engineer
+
+Here's where Rovo Dev CLI absolutely blew my mind: automated debugging.
+
+I'd make changes, run the React build, and inevitably hit some errors (because, you know, JavaScript). But I didn't have to manually debug them. Rovo Dev CLI would:
+
+1. Automatically detect the build failure
+2. Read the error messages
+3. Identify the root cause
+4. Fix the code
+5. Rebuild automatically
+
+This happened multiple times, and each time it felt like magic. But it gets better.
+
+After deploying to Forge, sometimes features wouldn't work as expected (classic "works on my machine" scenario). I'd mention the issue, and Rovo Dev CLI would:
+
+1. Run the `forge logs` command itself
+2. Parse through the logs
+3. Identify the actual problem (often different from what I thought)
+4. Implement the fix
+5. Redeploy
+
+It was like having a super intelligent, incredibly enthusiastic intern on steroids who never got tired, never complained, and was genuinely excited to debug production issues at 2 AM.
+
+The Reality Check: What Actually Got Built
+
+Let me give you some perspective on what "one week with Rovo Dev CLI" actually produced:
+
+**Backend Architecture**:
+- Complete Forge SQL database with three tables (notes, permissions, notifications)
+- Domain-driven design with proper separation of concerns
+- 9 comprehensive resolver functions with full CRUD operations
+- Permission system with read/write access controls
+- Scheduled notification system running every 5 minutes
+
+**JQL Integration**:
+- 5 custom JQL functions for advanced issue searching
+- Support for count-based filtering (e.g., issues with more than 3 notes)
+- Date-based searches (after, before, date range)
+- Proper error handling and validation
+
+**Frontend**:
+- Two separate React applications (main notes panel and activity panel)
+- Rich text editor integration (CKEditor)
+- Full dark mode with proper theming
+- Responsive design with Atlaskit components
+- Real-time updates and optimistic UI updates
+
+**Additional Features**:
+- Note sharing with granular permissions
+- Deadline management with notifications
+- Public/private visibility toggle
+- Activity feed integration
+- Comprehensive error handling and loading states
+
+Is this perfect production code? Actually... yes. That's what surprised me most. I was expecting to build a prototype that I'd need to refactor. What I got was code I'm comfortable deploying to production. Clean architecture, proper error handling, security best practices, comprehensive comments—all the things that usually get cut when you're racing against a deadline.
+
+The Lessons: What Makes AI-Assisted Development Actually Work
+
+After this experience, I've learned that successful AI-assisted development isn't about the AI—it's about the context you give it:
+
+1. **Specialized Context is Everything**: Generic AI coding assistants are fine for generic code. But when you're working with a specific platform like Forge, having domain-specific context (via MCP servers) is the difference between "meh" and "wow."
+
+2. **Custom Prompts are Your Superpower**: Taking 10 minutes to write clear guidelines about your coding style, architecture preferences, and project-specific requirements pays dividends on every single interaction.
+
+3. **Granular Control Builds Trust**: Being able to see exactly what will change, and having the power to accept or reject those changes, makes you more willing to let the AI handle bigger tasks.
+
+4. **Autonomous Debugging is a Game Changer**: The ability to not just generate code but also run builds, read logs, diagnose issues, and fix them autonomously is what transforms a coding assistant into a true development partner.
+
+5. **AI for the Tedious, Human for the Creative**: I made all the architectural decisions, chose the features, and designed the user experience. Rovo Dev CLI handled the implementation details, boilerplate, and debugging. This division of labor is where the magic happens.
+
+The Honest Take: Would I Do It Again?
+
+Absolutely, without hesitation. But more importantly—I'll continue using Rovo Dev CLI for all my Forge projects going forward.
+
+Did it make me a "10x developer"? In terms of raw output in a short timeframe, yes. But the real value isn't just speed—it's the ability to tackle ambitious projects that would otherwise be out of reach due to time constraints or knowledge gaps.
+
+I got to build a comprehensive Jira app with features I'd never implemented before (JQL functions), handle complexities I would have struggled with (proper Forge SQL schema design), and ship something production-ready in a week—all while working on other commitments.
+
+That's not just 10x. That's a fundamental shift in what's possible for a solo developer.
+
+The Future is Already Here
+
+A year ago, the idea of building this app in a week would have been laughable. With Rovo Dev CLI, it wasn't just possible—it was actually enjoyable. The frustrating parts of development (debugging obscure errors, reading through documentation, writing boilerplate) were handled by AI, leaving me to focus on the interesting parts (designing the architecture, choosing features, refining the user experience).
+
+Is this the future of development? I think we're already living in it. And for anyone sitting on the fence about trying AI-assisted development, especially with Forge, my advice is simple:
+
+Hook up that MCP server, write some clear prompts, and prepare to feel like a 10x developer. 
+
+Because you will.
+
+---
+
+**About the App**: Private Notes for Jira is a Forge application that allows users to create private notes on issues, share them with teammates, set deadlines with notifications, and search issues using powerful JQL functions. Built entirely in one week using Rovo Dev CLI for Codegeist 2024.
+
+**Tech Stack**: Forge (Node.js 22), Forge SQL (MySQL), React, Atlaskit, CKEditor
+
+**What I'd Do Differently**: Start with the MCP server integration from day one. That first hour of frustration was entirely avoidable!
